@@ -1,0 +1,93 @@
+/* Reset some default styles */
+body, ul, li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Overall container styles */
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* User list styles */
+.user-list {
+    flex: 1;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+}
+
+.user-list h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.user-list ul {
+    padding-left: 20px;
+}
+
+.user-list li {
+    font-size: 16px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+/* Chat window styles */
+.chat-window {
+    flex: 3;
+    padding: 10px;
+}
+
+.chat-window h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.messages {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.messages ul {
+    list-style: none;
+}
+
+.messages li {
+    font-size: 14px;
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.input-area {
+    margin-top: 10px;
+}
+
+#message-input {
+    width: 80%;
+    padding: 5px;
+    font-size: 14px;
+}
+
+#send-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+#send-button:hover {
+    background-color: #0056b3;
+}

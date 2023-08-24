@@ -52,8 +52,11 @@ body {
   }
   
   #error-message {
-    color: #e74c3c;
-    margin-top: 16px;
-    text-align: center;
+    color: red;
   }
+
+  #asterisk{
+    color:red;
+}
+
   

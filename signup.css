@@ -57,3 +57,11 @@ input[type="submit"]:hover {
 input::placeholder {
     color: #888888;
 }
+
+#error-message {
+    color: red;
+  }
+
+#asterisk{
+    color:red;
+}

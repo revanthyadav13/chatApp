@@ -13,25 +13,25 @@
         </header>
         <main>
             <form>
-                <label for="name">Name<span style="color: red;">*</span></label>
+                <label for="name">Name<span id="asterisk">*</span></label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" required>
                 <br>
-                <label for="email">Email<span style="color: red;">*</span></label>
+                <label for="email">Email<span id="asterisk">*</span></label>
                 <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 <br>
-                <label for="phoneNumber">Phone Number<span style="color: red;">*</span></label>
+                <label for="phoneNumber">Phone Number<span id="asterisk">*</span></label>
                 <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" required>
                 <br>
-                <label for="password">Password<span style="color: red;">*</span></label>
-                <input type="password" id="password" name="password" placeholder="Enter your password"required>
+                <label for="password">Password<span id="asterisk">*</span></label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 <br>
                 <input type="submit" id="signup" value="Sign Up">
             </form>
         </main>
         <div class="existing-user-login">
-            <p>Existing User - <a href="#">Login</a></p>
+            <p>Existing User - <a href="F:\Revanth files\chatApp\login.html">Login</a></p>
         </div>
-        <div id="error-message" style="color: red;"></div>
+        <p id="error-message"></p>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
     <script src="signup.js"></script>

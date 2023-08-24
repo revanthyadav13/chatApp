@@ -24,6 +24,10 @@ const UserDetails = sequelize.define('userDetails', {
    password: {
     type: Sequelize.STRING,
     allowNull: false
+  },
+   userStatus:{
+    type:Sequelize.BOOLEAN,
+    allowNull:false
   }
 });
 

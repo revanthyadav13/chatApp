@@ -5,21 +5,26 @@
     <title>Chat App</title>
 </head>
 <body>
+    <div class="header">
+    <h4 id="username" ></h4>
+    <button id="logout-button" onclick="logout()">Logout</button>
+    </div>
     <div class="container">
         <div class="user-list">
             <h2>Online Users</h2>
             <ul id="listOfOnlineUsers"></ul>
         </div>
         <div class="chat-window">
-            <h2>Chat</h2>
             <div class="messages">
                 <ul id="listOfMessages"></ul>
             </div>
             <div class="input-area">
-                <input type="text" id="message-input" placeholder="Type a message...">
+                <input type="text" id="message-input" name="message" placeholder="Type a message...">
                 <button id="send-button">Send</button>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="chat.js"></script>
 </body>
 </html>

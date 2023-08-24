@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", fetchMessageList);
 document.addEventListener("DOMContentLoaded", fetchUserNameList);
+setInterval(fetchMessageList, 1000);
 const token=localStorage.getItem('token');
 
 function fetchUserNameList(){
@@ -19,6 +20,7 @@ axios
     .get(`http://localhost:3000/chatApp/fetch-message`,{headers:{"Authorization":token}})
     .then((response) => {
       document.getElementById("username").innerHTML=response.data.username[0].name;
+      clearList();
     for(var i=0;i<response.data.allChats.length;i++){
            showChat(response.data.allChats[i])
      }

@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const Chat=require('../models/chat');
 const UserDetails=require('../models/userDetails');
 
@@ -17,11 +18,16 @@ exports.postRequestSendMessage=async(req, res)=>{
 
  exports.getRequestFetchMessage=async(req,res)=>{
     try{
-        const userId=req.user.id
-         const chats = await Chat.findAll();
-         const username = await UserDetails.findAll({where:{id:userId}});
-
-    res.status(200).json({allChats: chats, username:username});
+        const { lastMessageId } = req.query;
+        const chats = await Chat.findAll({
+      where: {
+        id: {
+          [Sequelize.Op.gt]: lastMessageId,
+        },
+      },
+      order: [['id', 'ASC']], // Adjust the sorting as needed
+    });;
+        res.status(200).json({allChats: chats});
     }catch(err){
         res.status(500).json({error:err});
     }
@@ -29,9 +35,11 @@ exports.postRequestSendMessage=async(req, res)=>{
 
  exports.getRequestFetchUserName=async(req, res)=>{
     try{
- const username = await UserDetails.findAll({where:{userStatus:true}});
+        const userId=req.user.id
+        const username = await UserDetails.findAll({where:{id:userId}});
+        const usersOnline = await UserDetails.findAll({where:{userStatus:true}});
 
-    res.status(200).json({username: username});
+    res.status(200).json({usersOnline: usersOnline, username:username});
     }catch(err){
         res.status(500).json({error:err});
     }

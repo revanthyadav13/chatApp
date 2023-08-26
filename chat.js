@@ -1,43 +1,80 @@
-document.addEventListener("DOMContentLoaded", fetchMessageList);
-document.addEventListener("DOMContentLoaded", fetchUserNameList);
-setInterval(fetchMessageList, 1000);
-const token=localStorage.getItem('token');
+document.addEventListener("DOMContentLoaded", () => {
+  fetchDataAndDisplay();
+  setInterval(fetchMessageList, 1000);
+});
+
+const token = localStorage.getItem('token');
+const storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
+let lastMessageId = storedMessages.length > 0 ? storedMessages[storedMessages.length - 1].id : undefined;
+
+function fetchDataAndDisplay() {
+  fetchUserNameList();
+  fetchFromLocalStorage();
+  document.getElementById("message-input").focus();
+  const sendBtn = document.getElementById("send-button");
+  sendBtn.addEventListener('click', textValidation);
+}
+
+function scrollToLatestMessage() {
+  const parentEle = document.getElementById("listOfMessages");
+  parentEle.scrollTop = parentEle.scrollHeight;
+}
+
+function fetchFromLocalStorage(){
+  clearList();
+  if (storedMessages.length > 0) {
+    for (const message of storedMessages) {
+      showChat(message);
+    }
+  }
+  scrollToLatestMessage();
+}
 
 function fetchUserNameList(){
 axios
     .get(`http://localhost:3000/chatApp/fetch-username`,{headers:{"Authorization":token}})
     .then((response) => {
-    for(var i=0;i<response.data.username.length;i++){
-           showUserNames(response.data.username[i])
+    document.getElementById("username").innerHTML=response.data.username[0].name;
+    for(var i=0;i<response.data.usersOnline.length;i++){
+           showUsersOnline(response.data.usersOnline[i])
      }
       })
       .catch((err)=>{
         console.log(err);
       })
 }
+
 function fetchMessageList(){
 axios
-    .get(`http://localhost:3000/chatApp/fetch-message`,{headers:{"Authorization":token}})
+    .get(`http://localhost:3000/chatApp/fetch-message?lastMessageId=${lastMessageId}`,{headers:{"Authorization":token}})
     .then((response) => {
-      document.getElementById("username").innerHTML=response.data.username[0].name;
-      clearList();
-    for(var i=0;i<response.data.allChats.length;i++){
-           showChat(response.data.allChats[i])
-     }
+            if(lastMessageId== undefined){
+               lastMessageId=-1
+            }
+         const newChats = response.data.allChats;
+        if (newChats.length > 0) {
+        for (const chat of newChats) {
+          storedMessages.push({ id: chat.id, name: chat.name, message: chat.message });
+          showChat(chat);
+          lastMessageId = chat.id;
+        }
+
+         const maxStoredMessages = 10;
+        while (storedMessages.length > maxStoredMessages) {
+          storedMessages.shift(); // Remove the oldest message
+        }
+
+        localStorage.setItem('messages', JSON.stringify(storedMessages));
+        clearList();
+        fetchFromLocalStorage();
+      }
+
       })
       .catch((err)=>{
         console.log(err);
       })
 }
   
-
-
-document.getElementById("message-input").focus();
-
-const sendBtn=document.getElementById("send-button");
-
-sendBtn.addEventListener('click',textValidation);
-
 function textValidation(event){
     event.preventDefault();
     const message=document.getElementById("message-input").value;
@@ -53,9 +90,17 @@ const message=document.getElementById("message-input").value;
 
 axios.post('http://localhost:3000/chatApp/send-message',{message},{headers:{"Authorization":token}})
         .then((response)=>{
-             clearList();
-            fetchMessageList();
-             clearField();
+           const user = response.data.newChat; // Make sure this structure matches your API response
+      if (user && user.name && user.message) {
+        const storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
+        storedMessages.push({id:user.id, name: user.name, message: user.message });
+        localStorage.setItem('messages', JSON.stringify(storedMessages));
+      }
+      
+         clearList();
+         fetchFromLocalStorage();
+          clearField(); 
+          
       })
         .catch((err)=>{
             console.log(err);
@@ -82,7 +127,7 @@ function clearList() {
   }
 }
 
-function showUserNames(userOnline){
+function showUsersOnline(userOnline){
     var parentEle= document.getElementById("listOfOnlineUsers");
     var childEle=document.createElement("li");
     childEle.setAttribute("id","new-user");

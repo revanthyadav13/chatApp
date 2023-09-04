@@ -26,13 +26,13 @@ function saveToDatabase(){
     const phoneNumber=document.getElementById("phoneNumber").value;
     const password=document.getElementById("password").value;
 
-    const userdetails={name:name, 
+    const User={name:name, 
         email:email, 
         phoneNumber:phoneNumber,
         password:password
         }
 
-        axios.post('http://localhost:3000/user/signup',userdetails)
+        axios.post('http://localhost:3000/user/signup',User)
         .then((response)=>{
              clearFields();
              alert('Successfully signed up');

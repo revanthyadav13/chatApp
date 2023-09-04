@@ -24,11 +24,11 @@ function saveToDatabase(){
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
     
-    const userdetails={ email:email, 
+    const User={ email:email, 
         password:password
         }
 
-        axios.post('http://localhost:3000/user/login',userdetails)
+        axios.post('http://localhost:3000/user/login',User)
         .then((response)=>{
                 alert(response.data.message);
                 localStorage.setItem('token',response.data.token);

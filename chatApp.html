@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="F:\Revanth files\chatApp\chatApp.css">
     <title>Chat App</title>
 </head>
@@ -10,12 +12,29 @@
     <button id="logout-button" onclick="logout()">Logout</button>
     </div>
     <div class="container">
-        <div class="user-list">
+        <div class="online-user-list">
             <h2>Online Users</h2>
             <ul id="listOfOnlineUsers"></ul>
         </div>
-        <div class="chat-window">
-            <div class="messages">
+        <div class="group-list">
+            <h2>Your Groups</h2>
+            <button id="new-group-button">New Group</button>
+            <ul id="listOfGroups"></ul>
+            <div id="create-group-form" style="display: none;">
+                <h3>Create a New Group</h3>
+                <form onsubmit="createNewGroup(event)">
+                    <label for="groupname">Group Name:</label>
+                    <input type="text" name="groupname" id="groupname" required><br>
+                    <label for="user_ids">User IDs (comma-separated):</label>
+                    <input type="text" id="user_ids" required>
+                   <button type="submit">Create Group</button>
+                    <button type="button" onclick="toggleCreateGroupForm()">Cancel</button>
+                </form>
+            </div>
+        </div>
+        <div class="group-name" id="group-name-container"></div>
+        <div class="chat-window" style="display: none;">
+            <div class="messages" id="message-container">
                 <ul id="listOfMessages"></ul>
             </div>
             <div class="input-area">
@@ -26,5 +45,6 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
     <script src="chat.js"></script>
+    <script src="group.js"></script>
 </body>
 </html>

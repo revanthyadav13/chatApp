@@ -16,25 +16,46 @@ body, ul, li {
 }
 
 /* User list styles */
-.user-list {
+.online-user-list, .group-list {
     flex: 1;
     padding: 10px;
     border-right: 1px solid #ccc;
 }
 
-.user-list h2 {
+.user-list h2, .group-list h2 {
     font-size: 18px;
     margin-bottom: 10px;
 }
 
-.user-list ul {
+.user-list ul, .group-list ul {
     padding-left: 20px;
 }
 
-.user-list li {
+.user-list li, .group-list li {
     font-size: 16px;
     margin-bottom: 5px;
     cursor: pointer;
+}
+
+/* Group name styles */
+.group-name {
+    margin-top: 10px;
+    font-size: 20px; /* Adjust the font size as needed */
+}
+
+/* Group list button styles */
+.group-list button#new-group-button {
+    padding: 5px 10px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.group-list button#new-group-button:hover {
+    background-color: #218838;
 }
 
 /* Chat window styles */
@@ -91,6 +112,8 @@ body, ul, li {
 #send-button:hover {
     background-color: #0056b3;
 }
+
+/* Header styles */
 .header {
     display: flex;
     justify-content: flex-end;
@@ -98,17 +121,46 @@ body, ul, li {
     padding: 10px 20px;
     background-color: #f0f0f0;
     border-bottom: 1px solid #ccc;
-  }
-  
-  #username {
+}
+
+#username {
     margin: 0;
     margin-right: 10px;
-  }
-  
-  #logout-button {
+}
+
+#logout-button {
     padding: 5px 10px;
     background-color: #ff0000;
     color: #fff;
     border: none;
     cursor: pointer;
-  }
+}
+
+#listOfGroups li {
+    display: block;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+#listOfGroups li:hover {
+    background-color: #e0e0e0;
+}
+
+/* User button styles */
+.user-button {
+    display: block;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    margin: 4px 0;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 4px;
+}

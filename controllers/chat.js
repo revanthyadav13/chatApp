@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const Chat=require('../models/chat');
-const UserDetails=require('../models/userDetails');
+const User=require('../models/User');
+const Group=require('../models/group');
 
 exports.postRequestSendMessage=async(req, res)=>{
 
@@ -19,14 +20,14 @@ exports.postRequestSendMessage=async(req, res)=>{
  exports.getRequestFetchMessage=async(req,res)=>{
     try{
         const { lastMessageId } = req.query;
-        const chats = await Chat.findAll({
+         const chats = await Chat.findAll({
       where: {
         id: {
           [Sequelize.Op.gt]: lastMessageId,
         },
       },
       order: [['id', 'ASC']], // Adjust the sorting as needed
-    });;
+    });
         res.status(200).json({allChats: chats});
     }catch(err){
         res.status(500).json({error:err});
@@ -36,8 +37,8 @@ exports.postRequestSendMessage=async(req, res)=>{
  exports.getRequestFetchUserName=async(req, res)=>{
     try{
         const userId=req.user.id
-        const username = await UserDetails.findAll({where:{id:userId}});
-        const usersOnline = await UserDetails.findAll({where:{userStatus:true}});
+        const username = await User.findAll({where:{id:userId}});
+        const usersOnline = await User.findAll({where:{userStatus:true}});
 
     res.status(200).json({usersOnline: usersOnline, username:username});
     }catch(err){
@@ -48,7 +49,7 @@ exports.postRequestSendMessage=async(req, res)=>{
  exports.getRequestLogOut=async(req, res)=>{
      try{
         const userId=req.user.id;
-        const status = await UserDetails.update({ userStatus: false}, {
+        const status = await User.update({ userStatus: false}, {
   where: {
     id: userId
   }
@@ -59,5 +60,7 @@ exports.postRequestSendMessage=async(req, res)=>{
         res.status(500).json({error:err});
     }
  }
+
+
 
  

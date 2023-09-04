@@ -10,4 +10,5 @@ router.get('/fetch-username', userAuthentication.authenticate, chatController.ge
 router.get('/fetch-message', userAuthentication.authenticate, chatController.getRequestFetchMessage);
 router.get('/logout', userAuthentication.authenticate, chatController.getRequestLogOut);
 
+
 module.exports = router;

@@ -8,7 +8,8 @@ function fetchUserNameList(){
 axios
     .get(`http://localhost:3000/chatApp/fetch-username`,{headers:{"Authorization":token}})
     .then((response) => {
-    document.getElementById("username").innerHTML=response.data.username[0].name;
+    document.getElementById("userId").innerHTML=`User ID: ${response.data.user[0].id}`;
+    document.getElementById("username").innerHTML=`User Name: ${response.data.user[0].name}`;
     for(var i=0;i<response.data.usersOnline.length;i++){
            showUsersOnline(response.data.usersOnline[i])
      }

@@ -37,10 +37,10 @@ exports.postRequestSendMessage=async(req, res)=>{
  exports.getRequestFetchUserName=async(req, res)=>{
     try{
         const userId=req.user.id
-        const username = await User.findAll({where:{id:userId}});
+        const user = await User.findAll({where:{id:userId}});
         const usersOnline = await User.findAll({where:{userStatus:true}});
 
-    res.status(200).json({usersOnline: usersOnline, username:username});
+    res.status(200).json({usersOnline: usersOnline, user:user});
     }catch(err){
         res.status(500).json({error:err});
     }

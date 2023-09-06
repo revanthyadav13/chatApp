@@ -8,6 +8,7 @@
 </head>
 <body>
     <div class="header">
+    <h4 id="userId" ></h4>
     <h4 id="username" ></h4>
     <button id="logout-button" onclick="logout()">Logout</button>
     </div>
@@ -33,6 +34,9 @@
             </div>
         </div>
         <div class="group-name" id="group-name-container"></div>
+        <div class="group-members" id="group-members-container">
+            <ul id="listOfGroupMembers"></ul>
+        </div>
         <div class="chat-window" style="display: none;">
             <div class="messages" id="message-container">
                 <ul id="listOfMessages"></ul>

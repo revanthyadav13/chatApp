@@ -77,6 +77,7 @@ function switchToGroup(groupId, groupName) {
   updateGroupName(groupName);
    storedMessagesByGroup[currentGroupId] = [];
   lastMessageId = undefined;
+  fetchGroupMembers(groupId);
   if (messageInterval) {
     clearInterval(messageInterval);
   }
@@ -162,3 +163,96 @@ function clearList() {
     parentEle.removeChild(parentEle.firstChild);
   }
 }
+
+function fetchGroupMembers(groupId) {
+  axios.get(`http://localhost:3000/group/members/${groupId}`, { headers: { "Authorization": token } })
+    .then((response) => {
+      const groupMembersList = document.getElementById('listOfGroupMembers');
+      groupMembersList.innerHTML = '';
+
+      const groupMembers = response.data.members;
+        groupMembers.forEach((groupMember)=>{
+          showGroupMembers(groupMember.groupId, groupMember.id, groupMember.username, groupMember.isAdmin);
+        })
+     
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function showGroupMembers(groupId, userId, username, isAdmin) {
+  const parentEle = document.getElementById("listOfGroupMembers");
+  const listItem = document.createElement("li");
+  listItem.textContent = username;
+
+  const adminLabel = document.createElement("span");
+  adminLabel.textContent = " (Group Admin)";
+  adminLabel.style.display = isAdmin ? "block" : "none"; // Show for admins
+  listItem.appendChild(adminLabel);
+
+  const makeAdminButton = document.createElement("button");
+  makeAdminButton.textContent = "Make Admin";
+  makeAdminButton.className = "make-admin-button";
+  makeAdminButton.style.display = isAdmin ? "none" : "block"; // Hide for admins
+  listItem.appendChild(makeAdminButton);
+
+  const dismissAdminButton = document.createElement("button");
+  dismissAdminButton.textContent = "Dismiss Admin";
+  dismissAdminButton.className = "dismiss-admin-button";
+  dismissAdminButton.style.display = isAdmin ? "block" : "none"; // Show for admins
+  listItem.appendChild(dismissAdminButton);
+
+  const removeUserButton = document.createElement("button");
+  removeUserButton.textContent = "Remove User";
+  removeUserButton.className = "remove-user-button";
+  listItem.appendChild(removeUserButton);
+
+  
+makeAdminButton.addEventListener("click", makeAdmin);
+ function makeAdmin() {
+  axios.put(`http://localhost:3000/group/make-admin/${groupId}/${userId}`, {}, { headers: { "Authorization": token } })
+    .then((response) => {
+      console.log(response.data.message);
+    adminLabel.style.display = "block";
+    makeAdminButton.style.display = "none";
+    dismissAdminButton.style.display = "block";
+      })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+dismissAdminButton.addEventListener("click", dismissAdmin);
+function dismissAdmin() {
+  axios.put(`http://localhost:3000/group/dismiss-admin/${groupId}/${userId}`, {}, { headers: { "Authorization": token } })
+    .then((response) => {
+      console.log(response.data.message);
+    adminLabel.style.display = "none";
+    makeAdminButton.style.display = "block";
+    dismissAdminButton.style.display = "none";
+      })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+removeUserButton.addEventListener("click", removeUser);
+function removeUser() {
+  axios.delete(`http://localhost:3000/group/remove-member/${groupId}/${userId}`, { headers: { "Authorization": token } })
+    .then((response) => {
+      console.log(response.data.message);
+      listItem.remove();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+  parentEle.appendChild(listItem);
+}
+
+
+
+
+

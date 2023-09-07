@@ -36,5 +36,43 @@ function logout(){
         });
 }
 
+const searchInput = document.getElementById("search-input");
+searchInput.addEventListener("input", searchUsers);
+function searchUsers(){
+axios.get(`http://localhost:3000/chatApp/fetch-users?search=${searchInput.value}`,{headers:{"Authorization":token}})
+.then((response) => {
+    
+    const searchResultsList = document.getElementById("search-results");
+            searchResultsList.innerHTML = "";
+           const searchResults = response.data.users;
+            searchResults.forEach((user) => {
+                showUser(user.name, user.id);
+            });
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+}
 
+function showUser(name, id){
+    var parentEle= document.getElementById("search-results");
+    var childEle=document.createElement("li");
+    childEle.setAttribute("id","user");
+    childEle.setAttribute("data-user-id", id);
+    childEle.innerHTML=name;
+    parentEle.appendChild(childEle);
 
+    childEle.addEventListener("click", function () {
+        const userIDsInput = document.getElementById("user_ids");
+        const userId = this.getAttribute("data-user-id");
+        
+        // Check if the input field already has content
+        if (userIDsInput.value.trim() === "") {
+            // If it's empty, set the clicked user's ID directly
+            userIDsInput.value = userId;
+        } else {
+            // If there is already content, append the clicked user's ID with a comma
+            userIDsInput.value += `,${userId}`;
+        }
+    });
+}

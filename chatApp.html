@@ -26,9 +26,14 @@
                 <form onsubmit="createNewGroup(event)">
                     <label for="groupname">Group Name:</label>
                     <input type="text" name="groupname" id="groupname" required><br>
+                    <div id="search-users">
+                        <h3>Search and Add Users</h3>
+                        <input type="text" id="search-input" placeholder="Search for users...">
+                        <ul id="search-results"></ul>
+                    </div>
                     <label for="user_ids">User IDs (comma-separated):</label>
-                    <input type="text" id="user_ids" required>
-                   <button type="submit">Create Group</button>
+                    <input type="text" id="user_ids" required><br>
+                    <button type="submit">Create Group</button>
                     <button type="button" onclick="toggleCreateGroupForm()">Cancel</button>
                 </form>
             </div>

@@ -62,5 +62,38 @@ exports.postRequestSendMessage=async(req, res)=>{
  }
 
 
+exports.getRequestFetchUsers=async(req, res)=>{
+    try{
+        const userId=req.user.id
+        const searchInput = req.query.search || '';
+        if (!searchInput) {
+            return res.status(200).json({ users: [] });
+        }
+        const users = await User.findAll({
+            where: {
+                id: {
+                    [Sequelize.Op.not]: userId,
+                },
+                [Sequelize.Op.or]: [
+                    {
+                        name: {
+                            [Sequelize.Op.like]: `%${searchInput}%`, // Case-insensitive name matching
+                        },
+                    },
+                    {
+                        id: {
+                            [Sequelize.Op.like]: `%${searchInput}%`, // Case-insensitive email matching
+                        },
+                    },
+                ],
+            },
+        });
+
+
+    res.status(200).json({users:users});
+    }catch(err){
+        res.status(500).json({error:err});
+    }
+ }
 
  

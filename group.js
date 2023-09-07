@@ -7,6 +7,7 @@ newGroupBtn.addEventListener('click', toggleCreateGroupForm);
 function toggleCreateGroupForm() {
   const createGroupForm = document.getElementById('create-group-form');
   createGroupForm.style.display = createGroupForm.style.display === 'none' ? 'block' : 'none';
+  
 }
 
 const storedMessages = JSON.parse(localStorage.getItem(`group${currentGroupId}`)) || [];
@@ -251,8 +252,5 @@ function removeUser() {
 
   parentEle.appendChild(listItem);
 }
-
-
-
 
 

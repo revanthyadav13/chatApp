@@ -10,6 +10,7 @@ exports.postRequestCreateGroup=async (req, res) => {
     try {
         const { groupname, userIds } = req.body;
         const admin =req.user.id;
+        userIds.unshift(admin);
         const group=await Group.create({groupname:groupname,admin:admin});
 
         for (let i=0;i<userIds.length;i++) {
@@ -196,3 +197,4 @@ exports.dismissAdmin = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while dismissing the user from admin role.' });
   }
 };
+

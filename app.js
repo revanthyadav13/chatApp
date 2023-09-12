@@ -3,7 +3,9 @@ const Sequelize= require('sequelize');
 const sequelize=require('./util/database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const socketIo = require('socket.io');
 const app = express();
+const http=require('http');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -31,9 +33,23 @@ Chat.belongsTo(Group);
 GroupMember.belongsTo(User);
 GroupMember.belongsTo(Group);
 
+const server = http.createServer(app);
+let io = socketIo(server,{
+    cors:{
+        origin:"*"
+    }
+});
+app.locals.server = server;
+app.locals.io = io;
+io.on('connection', (socket) => {
+  socket.on('join_group', (groupId) => {
+    socket.join(`group_${groupId}`);
+  });
+});
+
 sequelize
 //.sync({alter:true})
 .sync()
   .then(result => {
-   app.listen(process.env.PORT);
+   server.listen(process.env.PORT);
   })

@@ -1,3 +1,4 @@
+const socket = io('http://localhost:3000');
 let currentGroupId = null;
 document.addEventListener("DOMContentLoaded", fetchUserGroups);
 
@@ -68,8 +69,6 @@ function fetchUserGroups() {
     });
 }
 
-
-let messageInterval;
 const storedMessagesByGroup = {};
 function switchToGroup(groupId, groupName) {
   currentGroupId = groupId;
@@ -79,13 +78,8 @@ function switchToGroup(groupId, groupName) {
    storedMessagesByGroup[currentGroupId] = [];
   lastMessageId = undefined;
   fetchGroupMembers(groupId);
-  if (messageInterval) {
-    clearInterval(messageInterval);
-  }
-
-  messageInterval = setInterval(() => {
-    fetchMessages(groupId);
-  }, 1000);
+  fetchMessages(groupId);
+  socket.emit('join_group', groupId);
 }
 
 function updateGroupName(groupName) {
@@ -147,9 +141,6 @@ function sendMessage() {
           localStorage.setItem(`group${currentGroupId}`, JSON.stringify(storedMessages));
         }
 
-        clearList();
-        fetchFromLocalStorage();
-        // Clear the input field after sending the message
         messageInput.value = '';
       })
       .catch((err) => {
@@ -157,6 +148,12 @@ function sendMessage() {
       });
   }
 }
+socket.on('new_message', (message) => {
+storedMessagesByGroup[currentGroupId] = storedMessagesByGroup[currentGroupId] || [];
+    storedMessagesByGroup[currentGroupId].push({ id: message.id, name: message.name, message: message.message });
+    showChat(message.name, message.message);
+    lastMessageId = message.id;
+  });
 
 function clearList() {
    const parentEle = document.getElementById("listOfMessages");

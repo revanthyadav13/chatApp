@@ -14,11 +14,6 @@ function toggleCreateGroupForm() {
 const storedMessages = JSON.parse(localStorage.getItem(`group${currentGroupId}`)) || [];
 let lastMessageId = storedMessages.length > 0 ? storedMessages[storedMessages.length - 1].id : undefined;
 
-function scrollToLatestMessage() {
-  const parentEle = document.getElementById("listOfMessages");
-  parentEle.scrollTop = parentEle.scrollHeight;
-}
-
 function fetchFromLocalStorage() {
   clearList();
   if (currentGroupId !== null) {
@@ -31,7 +26,6 @@ function fetchFromLocalStorage() {
       }
     }
   }
-  scrollToLatestMessage();
 }
 
 function createNewGroup(event) {
@@ -121,16 +115,51 @@ function fetchMessages(groupId) {
 function showChat(name, message) {
   const parentEle = document.getElementById("listOfMessages");
   const childEle = document.createElement("li");
-  childEle.textContent = `${name}: ${message}`;
+  if (message.startsWith("http") || message.startsWith("https")) {
+    const link = document.createElement("a");
+    link.href = message;
+    link.textContent = message;
+    childEle.appendChild(link);
+  } else {
+    childEle.textContent = `${name}: ${message}`;
+  }
+
   parentEle.appendChild(childEle);
 }
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
+const fileInput = document.getElementById('file-input');
+fileInput.addEventListener('change', handleFileUpload);
+
+function handleFileUpload() {
+  const file = fileInput.files[0];
+  if (file) {
+    uploadFile(file);
+  }
+}
+function uploadFile(file) {
+  const formData = new FormData();
+    formData.append('file', file);
+    if(formData){
+      document.getElementById('loader').style.display = 'inline-block';
+  document.getElementById('send-button-text').style.display = 'none';
+    }
+axios.post('http://localhost:3000/group/upload', formData, {headers: {"Content-Type": "multipart/form-data","Authorization": token}})
+  .then((response) => {
+    fileInput.value = '';
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('send-button-text').style.display = 'inline-block';
+    document.getElementById('message-input').value=response.data.fileUrl;
+    console.log('File uploaded successfully:', response.data);
+  })
+  .catch((error) => {
+    console.error('File upload failed:', error);
+  });
+}
 
 function sendMessage() {
-  const messageInput = document.getElementById('message-input');
-  const messageText = messageInput.value.trim();
-
+const messageInput = document.getElementById('message-input');
+const messageText = messageInput.value.trim();
   if (messageText && currentGroupId) {
     axios.post(`http://localhost:3000/group/send-message`, { groupId: currentGroupId, text: messageText }, { headers: { "Authorization": token } })
       .then((response) => {
@@ -140,20 +169,19 @@ function sendMessage() {
           storedMessages.push({ id: user.id, name: user.name, message: user.message });
           localStorage.setItem(`group${currentGroupId}`, JSON.stringify(storedMessages));
         }
-
-        messageInput.value = '';
-      })
+       messageInput.value = '';
+       scrollToLatestMessage();
+        })
       .catch((err) => {
         console.log(err);
       });
   }
 }
+
+
 socket.on('new_message', (message) => {
-storedMessagesByGroup[currentGroupId] = storedMessagesByGroup[currentGroupId] || [];
-    storedMessagesByGroup[currentGroupId].push({ id: message.id, name: message.name, message: message.message });
-    showChat(message.name, message.message);
-    lastMessageId = message.id;
-  });
+showChat(message.name, message.message);
+    });
 
 function clearList() {
    const parentEle = document.getElementById("listOfMessages");
@@ -161,7 +189,10 @@ function clearList() {
     parentEle.removeChild(parentEle.firstChild);
   }
 }
-
+function scrollToLatestMessage() {
+  const messageContainer = document.getElementById('message-container');
+  messageContainer.scrollTop = messageContainer.scrollHeight;
+}
 function fetchGroupMembers(groupId) {
   axios.get(`http://localhost:3000/group/members/${groupId}`, { headers: { "Authorization": token } })
     .then((response) => {
@@ -169,8 +200,10 @@ function fetchGroupMembers(groupId) {
       groupMembersList.innerHTML = '';
 
       const groupMembers = response.data.members;
-        groupMembers.forEach((groupMember)=>{
-          showGroupMembers(groupMember.groupId, groupMember.id, groupMember.username, groupMember.isAdmin);
+      const loggedInUser=response.data.loggedInUser[0].id;
+      
+       groupMembers.forEach((groupMember)=>{
+          showGroupMembers(groupMember.groupId, groupMember.id, groupMember.username, groupMember.isAdmin, loggedInUser);
         })
      
     })
@@ -179,7 +212,9 @@ function fetchGroupMembers(groupId) {
     });
 }
 
-function showGroupMembers(groupId, userId, username, isAdmin) {
+
+function showGroupMembers(groupId, userId, username, isAdmin, loggedInUser) {
+  
   const parentEle = document.getElementById("listOfGroupMembers");
   const listItem = document.createElement("li");
   listItem.textContent = username;
@@ -190,34 +225,54 @@ function showGroupMembers(groupId, userId, username, isAdmin) {
   listItem.appendChild(adminLabel);
 
   const makeAdminButton = document.createElement("button");
+  const dismissAdminButton = document.createElement("button");
+  const removeUserButton = document.createElement("button");
   makeAdminButton.textContent = "Make Admin";
   makeAdminButton.className = "make-admin-button";
-  makeAdminButton.style.display = isAdmin ? "none" : "block"; // Hide for admins
+  if(loggedInUser==userId){
+    makeAdminButton.style.display = "none";
+    dismissAdminButton.style.display = "none";
+    removeUserButton.style.display = "none";
+  }else{
+makeAdminButton.style.display = isAdmin ? "none" : "block"; // Hide for admins
+  }
+  
   listItem.appendChild(makeAdminButton);
 
-  const dismissAdminButton = document.createElement("button");
+  
   dismissAdminButton.textContent = "Dismiss Admin";
   dismissAdminButton.className = "dismiss-admin-button";
-  dismissAdminButton.style.display = isAdmin ? "block" : "none"; // Show for admins
+  if(loggedInUser==userId){
+    makeAdminButton.style.display = "none";
+    dismissAdminButton.style.display = "none";
+    removeUserButton.style.display = "none";
+  }else{
+    dismissAdminButton.style.display = isAdmin ? "block" : "none"; // Show for admins
+  }
+  
   listItem.appendChild(dismissAdminButton);
 
-  const removeUserButton = document.createElement("button");
+  
   removeUserButton.textContent = "Remove User";
   removeUserButton.className = "remove-user-button";
+  if(loggedInUser==userId){
+makeAdminButton.style.display = "none";
+    dismissAdminButton.style.display = "none";
+    removeUserButton.style.display = "none";
+  }
   listItem.appendChild(removeUserButton);
-
-  
+ 
 makeAdminButton.addEventListener("click", makeAdmin);
  function makeAdmin() {
   axios.put(`http://localhost:3000/group/make-admin/${groupId}/${userId}`, {}, { headers: { "Authorization": token } })
     .then((response) => {
-      console.log(response.data.message);
     adminLabel.style.display = "block";
     makeAdminButton.style.display = "none";
     dismissAdminButton.style.display = "block";
       })
     .catch((error) => {
-      console.error(error);
+      console.error(error.message);
+      alert(`${error.message} only admins have access`);
     });
 }
 
@@ -225,13 +280,13 @@ dismissAdminButton.addEventListener("click", dismissAdmin);
 function dismissAdmin() {
   axios.put(`http://localhost:3000/group/dismiss-admin/${groupId}/${userId}`, {}, { headers: { "Authorization": token } })
     .then((response) => {
-      console.log(response.data.message);
     adminLabel.style.display = "none";
     makeAdminButton.style.display = "block";
     dismissAdminButton.style.display = "none";
       })
     .catch((error) => {
-      console.error(error);
+      console.error(error.message);
+      alert(`${error.message} only admins have access`);
     });
 }
 
@@ -239,15 +294,16 @@ removeUserButton.addEventListener("click", removeUser);
 function removeUser() {
   axios.delete(`http://localhost:3000/group/remove-member/${groupId}/${userId}`, { headers: { "Authorization": token } })
     .then((response) => {
-      console.log(response.data.message);
       listItem.remove();
     })
     .catch((error) => {
-      console.error(error);
+      console.error(error.message);
+      alert(`${error.message} only admins have access`);
     });
 }
 
   parentEle.appendChild(listItem);
 }
+
 
 

@@ -3,8 +3,9 @@ const Group= require('../models/group');
 const User= require('../models/user');
 const GroupMember= require('../models/groupMember');
 const Chat= require('../models/chat');
-
-
+const AWS= require('aws-sdk');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Set the destination directory for temporary file storage
 
 exports.postRequestCreateGroup=async (req, res) => {
     try {
@@ -76,7 +77,8 @@ exports.postRequestSendMessage=async(req, res) => {
   const userId = req.user.id;
   const name=req.user.name; 
 const message=await Chat.create({name:name, message:text, userId:userId, groupId:groupId});
-  res.json({ success: true, message: message });
+req.app.locals.io.to(`group_${groupId}`).emit('new_message', message);
+  res.status(200).json({ success: true, message: message });
   }catch(err){
     res.status(500).json({ error: 'An error occurred while fetching  group messages' });
   }
@@ -86,7 +88,7 @@ const message=await Chat.create({name:name, message:text, userId:userId, groupId
 exports.getRequestGroupMembers = async (req, res) => {
   try {
     const groupId = req.params.groupId;
-
+     const userId=req.user.id;
     const groupMembers = await GroupMember.findAll({
       where: { groupId },
       include: [{ model: User }],
@@ -100,8 +102,8 @@ exports.getRequestGroupMembers = async (req, res) => {
         isAdmin:groupMember.isAdmin
       };
     });
-
-    res.status(200).json({ members });
+const loggedInUser= await User.findAll({where:{id:userId}})
+    res.status(200).json({ members, loggedInUser});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -198,3 +200,45 @@ exports.dismissAdmin = async (req, res) => {
   }
 };
 
+const BUCKET_NAME = 'groupchat13';
+const IAM_USER_KEY = process.env.IAM_USER_KEY;
+const IAM_USER_SECRET = process.env.IAM_USER_SECRET;
+
+AWS.config.update({
+  accessKeyId: IAM_USER_KEY,
+  secretAccessKey: IAM_USER_SECRET,
+});
+
+const s3bucket = new AWS.S3();
+exports.postRequestUpload= async (req, res) => {
+  try {
+    const { file } = req; // Accessing the uploaded file through req.file
+    const filename = file.originalname;
+    const fileData = require('fs').readFileSync(file.path);
+  const groupId= req.body.groupId;
+  const text = req.body.text;
+  const userId = req.user.id;
+  const name=req.user.name; 
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: filename,
+      Body: fileData,
+      ACL: 'public-read',
+    };
+
+   s3bucket.upload(params,async (err, s3response) => {
+      if (err) {
+        console.log('Something went wrong', err);
+        return res.status(500).json({ error: 'File upload failed' });
+      } else {
+        console.log('File uploaded successfully', s3response);
+        const fileUrl = s3response.Location;
+       return res.status(200).json({ success: true, fileUrl });
+      }
+    });
+
+  } catch (error) {
+    console.error('Error uploading file', error);
+    return res.status(500).json({ error: 'File upload failed' });
+  }
+};

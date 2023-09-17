@@ -1,4 +1,7 @@
 const socket = io('http://localhost:3000');
+socket.on('new_message', (message) => {
+showChat(message.name, message.message);
+    });
 let currentGroupId = null;
 document.addEventListener("DOMContentLoaded", fetchUserGroups);
 
@@ -74,9 +77,7 @@ function switchToGroup(groupId, groupName) {
   fetchGroupMembers(groupId);
   fetchMessages(groupId);
   socket.emit('join_group', groupId);
-  socket.on('new_message', (message) => {
-showChat(message.name, message.message);
-    });
+  
 }
 
 function updateGroupName(groupName) {

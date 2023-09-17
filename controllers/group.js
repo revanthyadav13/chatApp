@@ -69,6 +69,11 @@ exports.getRequestGroupMessages=async(req, res) => {
   }
   
 }
+exports.handleSocketConnection = (socket) => {
+  socket.on('join_group', (groupId) => {
+    socket.join(`group_${groupId}`);
+  });
+};
 
 exports.postRequestSendMessage=async(req, res) => {
    try{
@@ -76,6 +81,7 @@ exports.postRequestSendMessage=async(req, res) => {
   const text = req.body.text;
   const userId = req.user.id;
   const name=req.user.name; 
+  
 const message=await Chat.create({name:name, message:text, userId:userId, groupId:groupId});
 req.app.locals.io.to(`group_${groupId}`).emit('new_message', message);
   res.status(200).json({ success: true, message: message });
@@ -242,3 +248,4 @@ exports.postRequestUpload= async (req, res) => {
     return res.status(500).json({ error: 'File upload failed' });
   }
 };
+

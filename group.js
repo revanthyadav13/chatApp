@@ -74,6 +74,9 @@ function switchToGroup(groupId, groupName) {
   fetchGroupMembers(groupId);
   fetchMessages(groupId);
   socket.emit('join_group', groupId);
+  socket.on('new_message', (message) => {
+showChat(message.name, message.message);
+    });
 }
 
 function updateGroupName(groupName) {
@@ -177,11 +180,6 @@ const messageText = messageInput.value.trim();
       });
   }
 }
-
-
-socket.on('new_message', (message) => {
-showChat(message.name, message.message);
-    });
 
 function clearList() {
    const parentEle = document.getElementById("listOfMessages");
